@@ -3,7 +3,6 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Todo = () => {
-  // State for input text, items, error messages, and modal visibility
   const [inputText, setInputText] = useState("");
   const [items, setItems] = useState([]);
   const [error, setError] = useState(false);
@@ -11,7 +10,6 @@ const Todo = () => {
   const [itemToRemove, setItemToRemove] = useState(null);
   const [itemToEdit, setItemToEdit] = useState(null);
 
-  // Load todos from local storage on component mount
   useEffect(() => {
     const storedItems = JSON.parse(localStorage.getItem("todos"));
     if (storedItems) {
@@ -19,143 +17,397 @@ const Todo = () => {
     }
   }, []);
 
-  // Save todos to local storage whenever items change
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(items));
   }, [items]);
 
-  // Function to handle item removal
   const handleRemove = () => {
     setItems((prevItems) => {
       const newItems = [...prevItems];
-      newItems.splice(itemToRemove, 1); // Remove the selected item
+      newItems.splice(itemToRemove, 1);
       return newItems;
     });
-    setShowModal(false); // Close the modal
-    toast.error("Item removed successfully"); // Show a toast message
+    setShowModal(false);
+    toast.error("Mission dropped! 💔");
   };
 
-  // Function to set up removal confirmation
   const confirmRemove = (index) => {
     setItemToRemove(index);
-    setShowModal(true); // Show the confirmation modal
+    setShowModal(true);
   };
 
-  // Function to add or update items
   const addItem = () => {
     if (inputText.trim() === "") {
-      setError(true); // Set error if input is empty
+      setError(true);
       return;
     }
-    setError(false); // Clear error
+    setError(false);
     if (itemToEdit !== null) {
-      // Editing an existing item
       setItems((prevItems) => {
         const newItems = [...prevItems];
-        newItems[itemToEdit].text = inputText; // Update item text
+        newItems[itemToEdit].text = inputText;
         return newItems;
       });
-      setItemToEdit(null); // Clear edit state
+      setItemToEdit(null);
     } else {
-      // Adding a new item
       setItems((prevItems) => [...prevItems, { text: inputText, completed: false }]);
     }
-    setInputText(""); // Reset input field
-    toast.success("Item added/updated successfully"); // Show success message
+    setInputText("");
+    toast.success("New mission unlocked! ✨");
   };
 
-  // Handle key press for adding items
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
-      addItem(); // Call addItem if Enter is pressed
+      addItem();
     }
   };
 
-  // Toggle the completion status of an item
   const toggleCompletion = (index) => {
     setItems((prevItems) => {
       const newItems = [...prevItems];
-      newItems[index].completed = !newItems[index].completed; // Toggle completed state
+      newItems[index].completed = !newItems[index].completed;
       return newItems;
     });
   };
 
-  // Set up the item for editing
   const editItem = (index) => {
-    setInputText(items[index].text); // Populate input with current item text
-    setItemToEdit(index); // Set the item index for editing
+    setInputText(items[index].text);
+    setItemToEdit(index);
   };
 
+  const completedCount = items.filter((i) => i.completed).length;
+  const totalCount = items.length;
+
   return (
-    <div className="min-h-screen bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
-      <div className="max-w-md w-full p-6 bg-white rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-center mb-5 text-purple-700">Todo List</h1>
-        <div className="flex items-center mb-4">
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #1a0033 0%, #0d001a 40%, #1a0033 70%, #2d0050 100%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: "'Segoe UI', sans-serif",
+        padding: "2rem 1rem",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* Decorative stars */}
+      {["10%,15%", "85%,10%", "5%,70%", "90%,65%", "50%,5%", "70%,85%", "25%,90%", "60%,20%"].map(
+        (pos, i) => {
+          const [left, top] = pos.split(",");
+          return (
+            <div
+              key={i}
+              style={{
+                position: "absolute",
+                left,
+                top,
+                width: i % 2 === 0 ? "6px" : "4px",
+                height: i % 2 === 0 ? "6px" : "4px",
+                borderRadius: "50%",
+                background: i % 3 === 0 ? "#ff6eb4" : i % 3 === 1 ? "#c084fc" : "#818cf8",
+                opacity: 0.7,
+                pointerEvents: "none",
+              }}
+            />
+          );
+        }
+      )}
+
+      <div
+        style={{
+          maxWidth: "460px",
+          width: "100%",
+          background: "rgba(255,255,255,0.05)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid rgba(255,110,180,0.3)",
+          borderRadius: "20px",
+          padding: "2rem",
+          boxShadow: "0 0 40px rgba(192,132,252,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
+          position: "relative",
+        }}
+      >
+        {/* Header */}
+        <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+          <div style={{ fontSize: "28px", marginBottom: "4px" }}>🎤</div>
+          <h1
+            style={{
+              fontSize: "26px",
+              fontWeight: "800",
+              background: "linear-gradient(90deg, #ff6eb4, #c084fc, #818cf8)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              margin: "0 0 4px",
+              letterSpacing: "1px",
+              textTransform: "uppercase",
+            }}
+          >
+            K-Pop Hunters
+          </h1>
+          <p style={{ color: "rgba(192,132,252,0.8)", fontSize: "13px", margin: 0 }}>
+            Track your fandom missions ✦
+          </p>
+
+          {/* Progress bar */}
+          {totalCount > 0 && (
+            <div style={{ marginTop: "14px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  fontSize: "11px",
+                  color: "rgba(255,255,255,0.5)",
+                  marginBottom: "6px",
+                }}
+              >
+                <span>MISSIONS CLEARED</span>
+                <span>
+                  {completedCount}/{totalCount}
+                </span>
+              </div>
+              <div
+                style={{
+                  height: "5px",
+                  background: "rgba(255,255,255,0.1)",
+                  borderRadius: "999px",
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    height: "100%",
+                    width: `${(completedCount / totalCount) * 100}%`,
+                    background: "linear-gradient(90deg, #ff6eb4, #c084fc)",
+                    borderRadius: "999px",
+                    transition: "width 0.4s ease",
+                  }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Input row */}
+        <div style={{ display: "flex", gap: "8px", marginBottom: error ? "6px" : "1rem" }}>
           <input
             type="text"
-            className={`flex-1 p-2 border-2 rounded-md transition-colors duration-300 ${
-              error ? "border-red-500" : "border-gray-300"
-            }`}
             value={inputText}
-            onChange={(e) => setInputText(e.target.value)} // Update input text
-            onKeyPress={handleKeyPress} // Handle Enter key press
-            placeholder="Add a new item"
+            onChange={(e) => {
+              setInputText(e.target.value);
+              if (error) setError(false);
+            }}
+            onKeyPress={handleKeyPress}
+            placeholder="Add a new mission..."
+            style={{
+              flex: 1,
+              padding: "10px 14px",
+              background: "rgba(255,255,255,0.07)",
+              border: `1.5px solid ${error ? "#f87171" : "rgba(192,132,252,0.35)"}`,
+              borderRadius: "10px",
+              color: "#fff",
+              fontSize: "14px",
+              outline: "none",
+              transition: "border-color 0.2s",
+            }}
           />
           <button
-            onClick={addItem} // Call addItem on click
-            className="bg-purple-600 text-white px-4 py-2 rounded-md ml-2 transition-transform duration-300 hover:scale-105"
+            onClick={addItem}
+            style={{
+              background: "linear-gradient(135deg, #ff6eb4, #c084fc)",
+              border: "none",
+              borderRadius: "10px",
+              color: "#fff",
+              fontSize: "13px",
+              fontWeight: "700",
+              padding: "10px 18px",
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              letterSpacing: "0.5px",
+            }}
           >
-            {itemToEdit !== null ? "Update" : "Add"} {/* Change button text based on state */}
+            {itemToEdit !== null ? "Update" : "+ Add"}
           </button>
         </div>
-        {error && <div className="text-red-500 text-sm mb-4">Please enter a valid item</div>}
-        <ul className="p-0 m-0 list-none">
+
+        {error && (
+          <p style={{ color: "#f87171", fontSize: "12px", marginBottom: "12px" }}>
+            Mission name can't be empty!
+          </p>
+        )}
+
+        {/* Todo list */}
+        <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "8px" }}>
+          {items.length === 0 && (
+            <li
+              style={{
+                textAlign: "center",
+                color: "rgba(255,255,255,0.3)",
+                fontSize: "13px",
+                padding: "2rem 0",
+              }}
+            >
+              No missions yet. Start hunting! 🌟
+            </li>
+          )}
           {items.map((item, index) => (
             <li
               key={index}
-              className={`bg-gray-100 p-3 mb-2 flex justify-between items-center rounded-lg shadow hover:shadow-lg transition-shadow duration-200 ${
-                item.completed ? "line-through text-gray-500" : ""
-              }`}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                background: item.completed
+                  ? "rgba(192,132,252,0.08)"
+                  : "rgba(255,255,255,0.06)",
+                border: `1px solid ${item.completed ? "rgba(192,132,252,0.25)" : "rgba(255,255,255,0.1)"}`,
+                borderRadius: "10px",
+                padding: "10px 14px",
+                transition: "all 0.2s",
+              }}
             >
-              <span onClick={() => toggleCompletion(index)} className="cursor-pointer">
-                {item.text} {/* Display item text */}
-              </span>
-              <div>
+              {/* Checkbox + text */}
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, cursor: "pointer" }}
+                onClick={() => toggleCompletion(index)}
+              >
+                <div
+                  style={{
+                    width: "18px",
+                    height: "18px",
+                    borderRadius: "50%",
+                    border: `2px solid ${item.completed ? "#c084fc" : "rgba(255,255,255,0.3)"}`,
+                    background: item.completed
+                      ? "linear-gradient(135deg, #ff6eb4, #c084fc)"
+                      : "transparent",
+                    flexShrink: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "10px",
+                    color: "#fff",
+                  }}
+                >
+                  {item.completed && "✓"}
+                </div>
+                <span
+                  style={{
+                    fontSize: "14px",
+                    color: item.completed ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.9)",
+                    textDecoration: item.completed ? "line-through" : "none",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  {item.text}
+                </span>
+              </div>
+
+              {/* Action buttons */}
+              <div style={{ display: "flex", gap: "6px", flexShrink: 0, marginLeft: "8px" }}>
                 <button
-                  className="bg-blue-500 text-white px-2 py-1 rounded-md mr-2 transition-transform duration-300 hover:scale-105"
-                  onClick={() => editItem(index)} // Call editItem on click
+                  onClick={() => editItem(index)}
+                  style={{
+                    background: "rgba(129,140,248,0.2)",
+                    border: "1px solid rgba(129,140,248,0.4)",
+                    borderRadius: "7px",
+                    color: "#a5b4fc",
+                    fontSize: "12px",
+                    padding: "4px 10px",
+                    cursor: "pointer",
+                    fontWeight: "600",
+                  }}
                 >
                   Edit
                 </button>
                 <button
-                  className="bg-red-500 text-white px-2 py-1 rounded-md transition-transform duration-300 hover:scale-105"
-                  onClick={() => confirmRemove(index)} // Call confirmRemove on click
+                  onClick={() => confirmRemove(index)}
+                  style={{
+                    background: "rgba(248,113,113,0.15)",
+                    border: "1px solid rgba(248,113,113,0.35)",
+                    borderRadius: "7px",
+                    color: "#fca5a5",
+                    fontSize: "12px",
+                    padding: "4px 10px",
+                    cursor: "pointer",
+                    fontWeight: "600",
+                  }}
                 >
-                  Remove
+                  Drop
                 </button>
               </div>
             </li>
           ))}
         </ul>
 
-        {/* Custom Confirmation Modal */}
+        {/* Confirmation Modal */}
         {showModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-6 rounded shadow-lg">
-              <h2 className="text-lg font-bold mb-4">Confirm Removal</h2>
-              <p>Are you sure you want to delete this item?</p>
-              <div className="mt-4 flex justify-end">
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.7)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 50,
+            }}
+          >
+            <div
+              style={{
+                background: "#1a0033",
+                border: "1px solid rgba(255,110,180,0.4)",
+                borderRadius: "16px",
+                padding: "1.5rem",
+                maxWidth: "320px",
+                width: "90%",
+                boxShadow: "0 0 30px rgba(192,132,252,0.25)",
+                textAlign: "center",
+              }}
+            >
+              <div style={{ fontSize: "32px", marginBottom: "8px" }}>💔</div>
+              <h2
+                style={{
+                  color: "#fff",
+                  fontSize: "17px",
+                  fontWeight: "700",
+                  margin: "0 0 8px",
+                }}
+              >
+                Drop this mission?
+              </h2>
+              <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "13px", margin: "0 0 1.2rem" }}>
+                This mission will be removed from your hunt list.
+              </p>
+              <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
                 <button
-                  className="bg-gray-300 text-black px-4 py-2 rounded-md mr-2"
-                  onClick={() => setShowModal(false)} // Close modal
+                  onClick={() => setShowModal(false)}
+                  style={{
+                    background: "rgba(255,255,255,0.08)",
+                    border: "1px solid rgba(255,255,255,0.15)",
+                    borderRadius: "9px",
+                    color: "rgba(255,255,255,0.7)",
+                    padding: "9px 20px",
+                    fontSize: "13px",
+                    cursor: "pointer",
+                    fontWeight: "600",
+                  }}
                 >
-                  Cancel
+                  Keep it
                 </button>
                 <button
-                  className="bg-red-500 text-white px-4 py-2 rounded-md"
-                  onClick={handleRemove} // Confirm removal
+                  onClick={handleRemove}
+                  style={{
+                    background: "linear-gradient(135deg, #ff6eb4, #f87171)",
+                    border: "none",
+                    borderRadius: "9px",
+                    color: "#fff",
+                    padding: "9px 20px",
+                    fontSize: "13px",
+                    cursor: "pointer",
+                    fontWeight: "700",
+                  }}
                 >
-                  Confirm
+                  Drop it
                 </button>
               </div>
             </div>
@@ -172,6 +424,7 @@ const Todo = () => {
           pauseOnFocusLoss
           draggable
           pauseOnHover
+          theme="dark"
         />
       </div>
     </div>
